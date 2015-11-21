@@ -18,7 +18,7 @@ public class GetOpt {
 	public GetOpt(String[] args){
 		this.args = args;
 	}
-	//Set helper usage
+	//Set helper usage if required
 	public void setHelper(String usage){
 		this.usage = usage;
 	}
