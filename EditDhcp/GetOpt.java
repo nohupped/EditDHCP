@@ -6,20 +6,24 @@
 import java.util.Arrays;
 import java.util.HashMap;
 public class GetOpt {
-	
+
 	private String[] args;
-	
-	public GetOpt(String[] args){
-		for(int count=0; count < args.length; count+=2){
-			if(!args[count].startsWith("-")) {
-				throw new IllegalArgumentException("Argument starts with '-'");
-			}
-		}
+	private String usage;
+	//Constructor accepting Args and Helper usage
+	public GetOpt(String[] args, String usage){
+		this.usage = usage;
 		this.args = args;
 	}
-	
-	//Check argument syntax
-	public static boolean checkArgs(String[] args){
+	//Constructor accepting Args only
+	public GetOpt(String[] args){
+		this.args = args;
+	}
+	//Set helper usage
+	public void setHelper(String usage){
+		this.usage = usage;
+	}
+	//Check argument validity
+	public boolean checkArgs() throws Exception{
 		if (args.length < 1){
 			throw new IllegalArgumentException("Zero Argument length");
 		}
@@ -30,31 +34,28 @@ public class GetOpt {
 		}
 		return true;
 	}
-	
-	/*public void setOptions(String[] args){
-		for(int count=0; count < args.length; count+=2){
-			if(!args[count].startsWith("-")) {
-				throw new IllegalArgumentException("Argument starts with '-'");
-				}
-			}
-		this.args = args;
-		}*/
+
 	
 	public String[] getOptions(){
 		return args;
 	}
 	
+	public String getHelper(){
+		return "Usage: " + usage;
+	}
+
 	public HashMap<String, String> mapOptions(){
 		HashMap<String, String> hmap = new HashMap<String, String>();
-		for(int i=0; i<args.length; i+=2){
-			try{
-				hmap.put(args[i], args[i+1]);
+			for(int i=0; i<args.length; i+=2){
+				try{
+					hmap.put(args[i], args[i+1]);
+					}
+				catch(Exception e){
+					hmap.put(args[i], null);
 				}
-			catch(Exception e){
-				System.out.println("Option syntax mismatch, please crosscheck"
-						+ " the options again\n" + e);
 			}
-		}
+
+
 		return hmap;
 	}
 	
@@ -63,7 +64,5 @@ public class GetOpt {
 	public String toString(){
 		return String.format("%s", Arrays.toString(getOptions()));
 	}
-	
-	
 	
 }
