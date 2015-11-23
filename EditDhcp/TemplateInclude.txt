@@ -1,0 +1,10 @@
+subnet dummynetwork netmask dummynetmask {
+   next-server xxx.xxx.xxx.xxx; //Change it to the next-server
+   host dummyhostname {
+       option host-name "dummyhostname";
+       hardware ethernet dummymacid;
+       fixed-address dummyip;
+       filename "pxelinux.0";
+       option routers dummyroute;
+     }
+}

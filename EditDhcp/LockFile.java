@@ -53,10 +53,16 @@ public class LockFile {
 		return f;
 	}
 	
-	public void purgeLock() throws IOException {
-		System.out.println("Removing " + lock);
-		f.close();
-		channel.close();
+
+	public void purgeLock() {
+		System.out.println("Removing aquired lock " + lock);
+		try{
+			f.close();
+			channel.close();
+		}
+		catch(Exception E){
+			System.out.println(E);
+		}
 	}
 
 }
