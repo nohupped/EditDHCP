@@ -11,6 +11,7 @@ public class Test{
 				+ " -network <The default network this host belongs. eg:172.16.207.0>"
 				+ " -netmask <The subnet of the network. eg:255.255.255.0>\n\n"
 				+ " -h to print this help and exit";
+		
 		String conf_file = null;
 		String ipAddress = null;
 		String macAddress = null;
@@ -65,6 +66,17 @@ public class Test{
 					+ "\n" + getoptions.getHelper());
 			Runtime.getRuntime().exit(1);
 		}
+//Take Backup
+		
+		BackupConf backup = new BackupConf(conf_file);
+		try{
+			backup.takeBackup(backup.getPath());
+		}
+		catch(Exception E){
+			System.out.println(E);
+			Runtime.getRuntime().exit(1);
+		}
+		
 //Validate file existance
 		try{
 			LockFile.Validate(conf_file);
@@ -75,12 +87,14 @@ public class Test{
 		}
 		
 //Create new File lock object
+
 		LockFile lockfile = new LockFile(conf_file);
+		
 		try{
-			lockfile.getLock();
+			lockfile.getLock(); //Acquires lock
 			String include_conf = UpdateConf.writeToIncludeFile(fqdn, macAddress,
-					ipAddress, route, network, netmask);
-			UpdateConf.writeToMainConf(lockfile, include_conf);
+					ipAddress, route, network, netmask); //Write to include file in /etc/dhcp/hosts
+			UpdateConf.writeToMainConf(lockfile, include_conf); //write to main conf /etc/dhcp/dhcp.conf
 			
 			
 			lockfile.purgeLock();

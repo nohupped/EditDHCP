@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -45,6 +46,7 @@ public class UpdateConf {
 	public static void setOutput(Formatter output) {
 		UpdateConf.output = output;
 	}
+	
 	/**
 	 * Write to the include file
 	 * @param fqdn that will be the filename in the include path and replaceAll 
@@ -62,7 +64,7 @@ public class UpdateConf {
 		File confFile = new File(path);
 		if(!confFile.exists()){
 			UpdateConf.setOutput(new Formatter(confFile));
-			StringBuffer template_read = UpdateConf.readFile();
+			StringBuffer template_read = UpdateConf.readFile("TemplateInclude.txt", true);
 			template_read = new StringBuffer(template_read.toString().replaceAll("dummyhostname", fqdn));
 			template_read = new StringBuffer(template_read.toString().replaceAll("dummymacid", macAddress));
 			template_read = new StringBuffer(template_read.toString().replaceAll("dummyip", ipAddress));
@@ -89,30 +91,51 @@ public class UpdateConf {
 		}	
 	}
 	
-	private static StringBuffer readFile(){
-		InputStream template = UpdateConf.class.getResourceAsStream("TemplateInclude.txt");
-		System.out.println("Attempting to read from template file");
-		InputStreamReader templateReader = new InputStreamReader(template);
-		BufferedReader br = new BufferedReader(templateReader);
-		StringBuffer sb = new StringBuffer();
-		String line = null;
-		try{
-			while((line = br.readLine()) != null){
-				sb.append(line).append("\n");
-			}
-			//System.out.println(sb);
-		}
-		catch(Exception E){
-			System.out.println(E);
-		}
-		return sb;
-	}
-
-	/**
-	 * @return the output
-	 */
-
-
 	
+	/**
+	 * 
+	 * @param template_conf which is the path to the file to read
+	 * @param TemplateInClassPath Boolean value. true if file is in ClassPath, false if not.
+	 * @return A StringBuffer object that can be used.
+	 */
+	
+	public static StringBuffer readFile(String template_conf, boolean TemplateInClassPath){
+		if(TemplateInClassPath == true){
+			InputStream template = UpdateConf.class.getResourceAsStream(template_conf);
+			System.out.println("Attempting to read from template file " + template_conf);
+			InputStreamReader templateReader = new InputStreamReader(template);
+			BufferedReader br = new BufferedReader(templateReader);
+			StringBuffer sb = new StringBuffer();
+			String line = null;
+			try{
+				while((line = br.readLine()) != null){
+					sb.append(line).append("\n");
+				}
+				//System.out.println(sb);
+			}
+			catch(Exception E){
+				System.out.println(E);
+			}
+			return sb;
+		}
+		else{
+			FileInputStream template;
+			StringBuffer sb = new StringBuffer();
+			try {
+				template = new FileInputStream(template_conf);
+				System.out.println("Attempting to read from file " + template_conf);
+				int content = template.available();
+				System.out.println("Total file size to read (in bytes) : "
+						+ content);
+				while((content = template.read()) != -1){
+					sb.append((char) content);
+				}
+			} catch (IOException e) {
+				e.printStackTrace();
+			}	
+			return sb;
+		}
+
+	}
 	
 }
