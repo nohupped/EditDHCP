@@ -10,6 +10,7 @@ public class BackupConf {
 	private String mainConf;
 	private Date date = new Date();
 	private final Long uniqnum = date.getTime();
+	private String backupPath;
 	
 	public BackupConf(String mainConf){
 		this.mainConf = mainConf;
@@ -21,7 +22,7 @@ public class BackupConf {
 	
 	public void takeBackup(String mainConf) throws IOException{
 		StringBuffer sourceConf = UpdateConf.readFile(mainConf, false);
-		String backupPath = mainConf+"."+uniqnum;
+		backupPath = mainConf + "." + uniqnum.toString();
 		System.out.println("Backing up main file " + mainConf + " to " + backupPath);
 		UpdateConf.setOutput(new Formatter(backupPath));
 		RandomAccessFile f = new RandomAccessFile(backupPath, "rw");
@@ -38,6 +39,10 @@ public class BackupConf {
 		}
 		
 		
+	}
+	
+	public String getBackupFilePath(){
+		return backupPath;
 	}
 
 }

@@ -1,4 +1,5 @@
 //import java.io.IOException;
+import java.io.IOException;
 import java.util.HashMap;
 public class Test{
 	public static void main(String[] args){
@@ -19,6 +20,8 @@ public class Test{
 		String route = null;
 		String network = null;
 		String netmask = null;
+		String include_conf = null; // Path to include file
+		int ExitStatus = 0;
 		
 	//	System.out.println(System.getProperty("user.name"));
 		GetOpt getoptions = new GetOpt(args, usage);
@@ -66,16 +69,7 @@ public class Test{
 					+ "\n" + getoptions.getHelper());
 			Runtime.getRuntime().exit(1);
 		}
-//Take Backup
-		
-		BackupConf backup = new BackupConf(conf_file);
-		try{
-			backup.takeBackup(backup.getPath());
-		}
-		catch(Exception E){
-			System.out.println(E);
-			Runtime.getRuntime().exit(1);
-		}
+
 		
 //Validate file existance
 		try{
@@ -86,13 +80,27 @@ public class Test{
 			Runtime.getRuntime().exit(1);
 		}
 		
+//Take Backup
+		
+		BackupConf backup = new BackupConf(conf_file);
+			try{
+				backup.takeBackup(backup.getPath());
+			}
+			catch(Exception E){
+				System.out.println("Cannot take backup of" + backup.getBackupFilePath());
+				System.out.println(E);
+				Runtime.getRuntime().exit(1);
+			}
+				
+	////			System.out.println(backup.getBackupFilePath());
+		
 //Create new File lock object
 
 		LockFile lockfile = new LockFile(conf_file);
 		
 		try{
 			lockfile.getLock(); //Acquires lock
-			String include_conf = UpdateConf.writeToIncludeFile(fqdn, macAddress,
+			include_conf = UpdateConf.writeToIncludeFile(fqdn, macAddress,
 					ipAddress, route, network, netmask); //Write to include file in /etc/dhcp/hosts
 			UpdateConf.writeToMainConf(lockfile, include_conf); //write to main conf /etc/dhcp/dhcp.conf
 			
@@ -102,7 +110,22 @@ public class Test{
 		catch(Exception E){
 			lockfile.purgeLock();
 			System.out.println(E);
+			Runtime.getRuntime().exit(1);
 		}
 		
+//Create new Service Restart object		
+		
+		RestartService restart = new RestartService("/etc/init.d/apache2", "restart");
+		
+		try {
+			ExitStatus = restart.Restart();
+		} catch (IOException e) {
+			System.out.println("Caught IO Exception while restarting service, check manually");
+		} catch (InterruptedException e) {
+			System.out.println("Interrupt caught while restarting. Check manually");
+		}
+		
+		System.out.println("Restart finished with exit status " + ExitStatus);
 	}
+	
 }
