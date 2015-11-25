@@ -41,12 +41,13 @@ public class RestartService {
 	public int Restart() throws IOException, InterruptedException{
 		String run = serviceInitScript + " " + Command;
 		Process p = Runtime.getRuntime().exec(run);
-		p.waitFor();
+		//p.waitFor();
 		BufferedReader stdInput = new BufferedReader(new InputStreamReader(p.getInputStream()));
 		String s;
 		while ((s = stdInput.readLine()) != null) {
 	        System.out.println(s);
 		}
+		p.waitFor();
 		int exitStatus = p.exitValue();
 		return exitStatus;
 	}

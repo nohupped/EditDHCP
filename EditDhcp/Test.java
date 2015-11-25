@@ -4,6 +4,7 @@ import java.util.HashMap;
 public class Test{
 	public static void main(String[] args){
 		
+		
 		String usage = "\n-c /path/to/configfile"
 				+ " -ip <new ipaddress of the host>"
 				+ " -mac <mac address of the pxe enabled interface>"
@@ -125,7 +126,20 @@ public class Test{
 			System.out.println("Interrupt caught while restarting. Check manually");
 		}
 		
-		System.out.println("Restart finished with exit status " + ExitStatus);
+		
+//Create restore process of conf file if ExitStatus is not 0
+
+		if(ExitStatus != 0){
+			System.out.println("Restart failed with exit status " + ExitStatus + ". Initiating restore of conf files."
+					+ " Check and validate the configuration. ");	
+			RestoreBackup restore = new RestoreBackup(backup.getBackupFilePath(), conf_file, include_conf);
+			restore.Restore();
+			
+		}
+		else{
+			System.out.println("Restart finished with exit status " + ExitStatus);
+		}
 	}
+
 	
 }
