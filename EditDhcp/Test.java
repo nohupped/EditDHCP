@@ -116,7 +116,7 @@ public class Test{
 		
 //Create new Service Restart object		
 		
-		RestartService restart = new RestartService("/etc/init.d/apache2", "restart");
+		RestartService restart = new RestartService("/etc/init.d/isc-dhcp-server", "restart");
 		
 		try {
 			ExitStatus = restart.Restart();
@@ -134,6 +134,13 @@ public class Test{
 					+ " Check and validate the configuration. ");	
 			RestoreBackup restore = new RestoreBackup(backup.getBackupFilePath(), conf_file, include_conf);
 			restore.Restore();
+			try{
+				restart.Restart();
+			}
+			catch(Exception E){
+				System.out.println("Something went wrong when restoring file and restarting service. Check manually.");
+				E.printStackTrace();
+			}
 			
 		}
 		else{
